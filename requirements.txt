@@ -1,0 +1,4 @@
+sacrebleu==1.4.4
+tqdm
+numpy
+tensorflow-gpu==2.1
