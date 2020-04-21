@@ -34,6 +34,7 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
     pe_target = 230
     d_model = 1024
 
+    # read and transform data to token ids, create tf dataset
     with open(input_file_path, "r") as f:
         english = f.read().strip()
 
@@ -67,6 +68,7 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
             data_english, padding='post')
     )).batch(64, drop_remainder=False)
 
+    # initialize transformer model and ops
     transformer = Transformer(
         num_layers=2, d_model=d_model, num_heads=8, dff=1024,
         input_vocab_size=len(english_id2word)+1, target_vocab_size=len(french_id2word)+1,
@@ -78,6 +80,7 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
     optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98,
                                          epsilon=1e-9)
 
+    # load best model checkpoint
     ckpt = tf.train.Checkpoint(transformer=transformer,
                                optimizer=optimizer)
 
@@ -88,6 +91,17 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
     ckpt.restore(ckpt_manager.latest_checkpoint)
 
     def generate_predictions(inp_sentences):
+        """Generate target language translations (autoregressive) 
+        
+        Args:
+        inp_sentences (tf.Tensor, dtype int32): the source language token ids 
+        french_word2id (dict): target language vocabulary (word to id mapping) dictionary
+        pe_target (int): sequence length to generate
+
+        Returns:
+        output (tf.Tensor, dtype int32): predicted target language token ids
+        attention_weights (tf.Tensor, dtype float32): decoder attention weights
+        """
         if len(inp_sentences.get_shape()) == 1:
             encoder_input = tf.expand_dims(inp_sentences, 0)
             decoder_input = [french_word2id["<start>"]]
@@ -124,9 +138,10 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
             # as its input.
             output = tf.concat([output, predicted_id], axis=-1)
 
-        # return tf.squeeze(output, axis=0), attention_weights
+        # return output, attention_weights
         return output, attention_weights
 
+    # generate and collect predictions from transformer
     all_preds = []
     for batch_i, inp in tqdm(enumerate(tensor_test), total=len(data_english) // 64 + 1):
         preds, attention = generate_predictions(inp)
