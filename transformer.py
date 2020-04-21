@@ -14,6 +14,7 @@ def get_angles(pos, i, d_model):
 
 
 def positional_encoding(position, d_model):
+    # positional encoding is added to give the model some information about the relative position of the words in the sentence.
     angle_rads = get_angles(np.arange(position)[:, np.newaxis],
                             np.arange(d_model)[np.newaxis, :],
                             d_model)
@@ -30,6 +31,7 @@ def positional_encoding(position, d_model):
 
 
 def create_padding_mask(seq):
+    # Mask all the pad tokens in the batch of sequence.
     seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
 
     # add extra dimensions to add the padding
@@ -38,6 +40,7 @@ def create_padding_mask(seq):
 
 
 def create_look_ahead_mask(size):
+    # The look-ahead mask is used to mask the future tokens in a sequence
     mask = 1 - tf.linalg.band_part(tf.ones((size, size)), -1, 0)
     return mask  # (seq_len, seq_len)
 
@@ -82,6 +85,17 @@ def scaled_dot_product_attention(q, k, v, mask):
 
 
 class MultiHeadAttention(tf.keras.layers.Layer):
+    """
+    Multi-head attention consists of four parts:
+
+    Linear layers and split into heads.
+    Scaled dot-product attention.
+    Concatenation of heads.
+    Final linear layer.
+    Each multi-head attention block gets three inputs; Q (query), K (key), V (value). 
+    These are put through linear (Dense) layers and split up into multiple heads.
+    And then put through a final Dense layer.
+    """
     def __init__(self, d_model, num_heads):
         super(MultiHeadAttention, self).__init__()
         self.num_heads = num_heads
@@ -144,6 +158,14 @@ def point_wise_feed_forward_network(d_model, dff):
 
 
 class EncoderLayer(tf.keras.layers.Layer):
+    """
+    Each encoder layer consists of sublayers:
+
+    Multi-head attention (with padding mask)
+    Point wise feed forward networks.
+    Each of these sublayers has a residual connection around it followed by a layer normalization. 
+    Residual connections help in avoiding the vanishing gradient problem in deep networks.
+    """
     def __init__(self, d_model, num_heads, dff, rate=0.1):
         super(EncoderLayer, self).__init__()
 
@@ -173,6 +195,15 @@ class EncoderLayer(tf.keras.layers.Layer):
 
 
 class DecoderLayer(tf.keras.layers.Layer):
+    """
+    Each decoder layer consists of sublayers:
+
+    Masked multi-head attention (with look ahead mask and padding mask)
+    Multi-head attention (with padding mask). V (value) and K (key) receive the encoder output as inputs. 
+    Q (query) receives the output from the masked multi-head attention sublayer.
+    Point wise feed forward networks
+    Each of these sublayers has a residual connection around it followed by a layer normalization.
+    """
     def __init__(self, d_model, num_heads, dff, rate=0.1):
         super(DecoderLayer, self).__init__()
 
@@ -213,6 +244,16 @@ class DecoderLayer(tf.keras.layers.Layer):
 
 
 class Encoder(tf.keras.layers.Layer):
+    """
+    The Encoder consists of:
+
+    Input Embedding
+    Positional Encoding
+    N encoder layers
+    The input is put through an embedding which is summed with the positional encoding. 
+    The output of this summation is the input to the encoder layers. 
+    The output of the encoder is the input to the decoder.
+    """
     def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size,
                  maximum_position_encoding, rate=0.1):
         super(Encoder, self).__init__()
@@ -247,6 +288,16 @@ class Encoder(tf.keras.layers.Layer):
 
 
 class Decoder(tf.keras.layers.Layer):
+    """
+    The Decoder consists of:
+
+    Output Embedding
+    Positional Encoding
+    N decoder layers
+    The target is put through an embedding which is summed with the positional encoding. 
+    The output of this summation is the input to the decoder layers. 
+    The output of the decoder is the input to the final linear layer.
+    """
     def __init__(self, num_layers, d_model, num_heads, dff, target_vocab_size,
                  maximum_position_encoding, rate=0.1):
         super(Decoder, self).__init__()
@@ -286,6 +337,9 @@ class Decoder(tf.keras.layers.Layer):
 
 
 class Transformer(tf.keras.Model):
+    """
+    Transformer consists of the encoder, decoder and a final linear layer. The output of the decoder is the input to the linear layer and its output is returned.
+    """
     def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size,
                  target_vocab_size, pe_input, pe_target, rate=0.1):
         super(Transformer, self).__init__()
@@ -315,6 +369,10 @@ class Transformer(tf.keras.Model):
 
 
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+    """
+    Use the Adam optimizer with a custom learning rate scheduler according to the formula in 
+    https://arxiv.org/abs/1706.03762  
+    """
     def __init__(self, d_model, warmup_steps=4000):
         super(CustomSchedule, self).__init__()
 
