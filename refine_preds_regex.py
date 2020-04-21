@@ -1,6 +1,8 @@
 import argparse
-import os, re
+import os
+import re
 from tqdm import tqdm
+
 
 def main(args):
     """
@@ -16,11 +18,11 @@ def main(args):
     file_path_suffix, ext = os.path.splitext(path)
     out_path = file_path_suffix + "_regex" + ext
 
-    print("Processing input file:",path)
-    lines = [i.strip() for i in open(path,'r').readlines()]
-    
+    print("Processing input file:", path)
+    lines = [i.strip() for i in open(path, 'r').readlines()]
+
     # reuse the variable $pattern
-    pattern = re.compile(r'(\b.+\b)\1\b') # bigram
+    pattern = re.compile(r'(\b.+\b)\1\b')  # bigram
 
     out = []
     for line in tqdm(lines):
@@ -29,9 +31,10 @@ def main(args):
         out.append(line)
 
     print("Saving to:", out_path, "...")
-    with open(out_path,'w') as f:
+    with open(out_path, 'w') as f:
         for line in tqdm(out):
-            print(line,file=f)
+            print(line, file=f)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='get filename to process')
