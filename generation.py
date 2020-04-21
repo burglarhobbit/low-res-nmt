@@ -36,8 +36,14 @@ class PredictionGenerator:
         self.val_accuracy = val_accuracy
 
     def loss_function(self, real, pred):
-        """
-        ! Raghav
+        """Calculates the masked crossentropy loss
+    
+        Args:
+          real (tf.Tensor, dtype int32): the actual token ids 
+          pred (tf.Tensor, dtype float32): predictions from the transformer decoder
+
+        Returns:
+          float: loss value 
         """
         mask = tf.math.logical_not(tf.math.equal(real, 0))
         loss_ = self.loss_object(real, pred)
@@ -188,8 +194,7 @@ def main(args):
     optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
     checkpoint_path = args.checkpoint_path
-    ckpt = tf.train.Checkpoint(transformer=transformer,
-                                                         optimizer=optimizer)
+    ckpt = tf.train.Checkpoint(transformer=transformer, optimizer=optimizer)
 
     ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=1)
 
