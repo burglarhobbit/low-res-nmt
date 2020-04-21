@@ -29,8 +29,8 @@ def generate_predictions(input_file_path: str, pred_file_path: str):
 
     print("Input file ", input_file_path)
 
-    npz_path = "../model/data_and_vocab_bt_st_upsample_.npz"
-    checkpoint_path = "../model/checkpoints/train_bt_st_5_upsample_redo__acc_"
+    npz_path = "../model/data_and_vocab_bt_st_upsample_best.npz"
+    checkpoint_path = "../model/checkpoints/train_bt_st_iter2_upsample_1__acc_"
     pe_target = 230
     d_model = 1024
 

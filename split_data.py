@@ -57,8 +57,8 @@ def split_dataset(data_path, text_data_1, text_data_2, split):
         f.write('\n'.join(val_text2))
 
 
-def main():
-    data_path = Path("/content/drive/My Drive/Adv Projects in ML/data")
+def main(args):
+    data_path = args.data_path
     english, french = read_data(data_path)
     split_dataset(data_path, english, french, 0.8)
 
@@ -80,4 +80,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_path', type=str, default="", help='parent data path')
+    args = parser.parse_args()
+    main(args)

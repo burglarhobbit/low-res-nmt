@@ -220,13 +220,13 @@ def main(args):
     french_val = read_file(data_path, val_lang2)
 
     # read monolingual data and synthetic bitext
-    french_st = read_file(data_path, "predictions/predictions_english_st.txt")
+    french_st = read_file(data_path, "predictions/predictions_english_st_regex.txt")
     print(len(french_st.split("\n")), french_st[:200])
 
     english_monolingual = read_file(data_path, "unaligned_tokenized_rempunc.en").lower()
     print(len(english_monolingual.split("\n")), english_monolingual[:200])
 
-    english_bt = read_file(data_path, "predictions/predictions_french_bt.txt")
+    english_bt = read_file(data_path, "predictions/predictions_french_bt_regex.txt")
     print(len(english_bt.split("\n")), english_bt[:200])
 
     french_monolingual = read_file(data_path, "unaligned_tokenized.fr")
