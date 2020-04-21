@@ -25,8 +25,8 @@ class PredictionGenerator:
         Args:
             transformer: A transformer.Transformer class object
             loss_object: A tf.keras.losses object to compute loss
-            val_loss: A tf.keras.metrics object to store mean loss
-            val_accuracy: A tf.keras.metrics object to store mean accuracy
+            val_loss: A tf.keras.metrics object to store mean loss of validation set
+            val_accuracy: A tf.keras.metrics object to store mean accuracy of validation set
         Returns:
             None
         """
@@ -48,8 +48,16 @@ class PredictionGenerator:
         return tf.reduce_sum(loss_)/tf.reduce_sum(mask)
 
     def generate_predictions(self,inp_sentences,french_word2id, pe_target):
-        """
-        ! Raghav
+        """Generate target language translations (autoregressive) 
+    
+        Args:
+          inp_sentences (tf.Tensor, dtype int32): the source language token ids 
+          french_word2id (dict): target language vocabulary (word to id mapping) dictionary
+          pe_target (int): sequence length to generate
+
+        Returns:
+          output (tf.Tensor, dtype int32): predicted target language token ids
+          attention_weights (tf.Tensor, dtype float32): decoder attention weights
         """
         if len(inp_sentences.get_shape())==1:
             encoder_input = tf.expand_dims(inp_sentences, 0)
@@ -96,7 +104,14 @@ class PredictionGenerator:
     @tf.function(input_signature=train_step_signature)
     def val_step(self,inp, tar):
         """
-        ! Raghav
+        validation loss and accuracy calculation over batch (uses teacher forcing)
+    
+        Args:
+          inp (tf.Tensor, dtype int32): the source language token ids 
+          tar (tf.Tensor, dtype int32): the target language token ids
+          
+        Returns: None
+
         """
         tar_inp = tar[:, :-1]
         tar_real = tar[:, 1:]

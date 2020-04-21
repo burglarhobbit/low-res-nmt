@@ -20,9 +20,22 @@ train_step_signature = [
 
 class TrainManager:
   """
-  !BHAVYA
+  TrainManager handle for efficiently training the transformer model by
+  holding instances of different variables.
   """
   def __init__(self, transformer, loss_object, train_loss, train_accuracy, val_loss, val_accuracy, optimizer):
+    """
+        Args:
+            transformer: A transformer.Transformer class object
+            loss_object: A tf.keras.losses object to compute loss
+            train_loss: A tf.keras.metrics object to store mean loss of train set
+            train_accuracy: A tf.keras.metrics.Mean object to store mean accuracy of train set
+            val_loss: A tf.keras.metrics.Mean object to store mean loss of validation set
+            val_accuracy: A tf.keras.metrics.Mean object to store mean accuracy of validation set
+            optimizer: A tf.keras.optimizers.Adam object to optimizer gradients over the loss
+        Returns:
+            None
+        """
     self.transformer = transformer
     self.loss_object = loss_object
     self.val_loss = val_loss
@@ -177,6 +190,14 @@ class TrainManager:
     compute_bleu(out_file,val_lang2,False) 
 
 def main(args):
+  """
+  Main function to perform the training task
+
+  Args:
+    args: An argparse object containing processed arguments
+  Returns:
+    None
+  """
   data_path = args.data_path
 
   print(data_path)
