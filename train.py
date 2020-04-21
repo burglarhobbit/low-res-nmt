@@ -214,8 +214,8 @@ def main(args):
     val_lang2 = args.val_lang2
 
     # load data and create vocab
-    english, english_vocab, english_word2id, english_id2word = read_file_and_process(data_path, train_lang1, limit_vocab=9000)
-    french, french_vocab, french_word2id, french_id2word = read_file_and_process(data_path, train_lang2, limit_vocab=10000)
+    english, english_vocab, english_word2id, english_id2word = read_file_and_process(data_path, train_lang1)
+    french, french_vocab, french_word2id, french_id2word = read_file_and_process(data_path, train_lang2)
     english_val = read_file(data_path, val_lang1)
     french_val = read_file(data_path, val_lang2)
 
