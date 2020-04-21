@@ -2,6 +2,7 @@
 # DATA GENERATION
 ##################################################
 """Self-Training Monolingual Data Generation"""
+
 import tensorflow as tf
 from transformer import Transformer, CustomSchedule, create_masks
 from utils import *
@@ -9,22 +10,35 @@ import numpy as np
 import os, sys
 from tqdm import tqdm
 
-
+# input signature for val_step tf.function
 train_step_signature = [
             tf.TensorSpec(shape=(None, None), dtype=tf.int32),
             tf.TensorSpec(shape=(None, None), dtype=tf.int32),
     ]
 
 class PredictionGenerator:
-
-    def __init__(self,transformer, loss_object, val_loss, val_accuracy):
+    """
+    Class to handle text generation of predictions by holding instances of different variables.
+    """
+    def __init__(self, transformer, loss_object, val_loss, val_accuracy):
+        """
+        Args:
+            transformer: A transformer.Transformer class object
+            loss_object: A tf.keras.losses object to compute loss
+            val_loss: A tf.keras.metrics object to store mean loss
+            val_accuracy: A tf.keras.metrics object to store mean accuracy
+        Returns:
+            None
+        """
         self.transformer = transformer
         self.loss_object = loss_object
         self.val_loss = val_loss
         self.val_accuracy = val_accuracy
 
     def loss_function(self, real, pred):
-
+        """
+        ! Raghav
+        """
         mask = tf.math.logical_not(tf.math.equal(real, 0))
         loss_ = self.loss_object(real, pred)
 
@@ -34,7 +48,9 @@ class PredictionGenerator:
         return tf.reduce_sum(loss_)/tf.reduce_sum(mask)
 
     def generate_predictions(self,inp_sentences,french_word2id, pe_target):
-
+        """
+        ! Raghav
+        """
         if len(inp_sentences.get_shape())==1:
             encoder_input = tf.expand_dims(inp_sentences, 0)
             decoder_input = [french_word2id["<start>"]]
@@ -79,7 +95,9 @@ class PredictionGenerator:
 
     @tf.function(input_signature=train_step_signature)
     def val_step(self,inp, tar):
-        
+        """
+        ! Raghav
+        """
         tar_inp = tar[:, :-1]
         tar_real = tar[:, 1:]
     
@@ -91,26 +109,15 @@ class PredictionGenerator:
         self.val_loss(loss)
         self.val_accuracy(tar_real, predictions)
 
-# similar to train transform but for test and only on one lang with amount_data params
-def transform_test_data(lang1, dict_word2id, amount_data_start=None,amount_data_end=None):
-    lines = lang1.split("\n")
-    if amount_data_start or amount_data_end:
-        lines = lines[amount_data_start:amount_data_end]
-    data = []
-
-    for line in lines:
-        line2id = [dict_word2id["<start>"]]
-        for word in line.split():
-            try:
-                line2id.append(dict_word2id[word])
-            except:
-                line2id.append(dict_word2id["<unk>"])
-        line2id.append(dict_word2id["<eos>"])
-        data.append(line2id)
-    return data
-
 def main(args):
+    """
+    Main function to generate text predictions
 
+    Args:
+        args: An argparse object containing processed arguments
+    Returns:
+        None
+    """
     npz_path = args.npz_path
 
     data = np.load(npz_path, allow_pickle=True)
@@ -130,7 +137,7 @@ def main(args):
     english_monolingual = read_file(data_path,"unaligned_tokenized_rempunc.en").lower()
     print(len(english_monolingual.split("\n")), english_monolingual[:200])
 
-    english_monolingual_data = transform_test_data(english_monolingual, english_word2id, amount_data_start, amount_data_end)
+    english_monolingual_data = transform_data(english_monolingual, english_word2id, amount_data_start, amount_data_end)
     print(len(english_monolingual_data))
 
     print(max([len(i) for i in english_monolingual_data]))
