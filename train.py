@@ -208,10 +208,10 @@ def main(args):
     print(os.listdir(data_path))
     print("Tensorflow version " + tf.__version__)
 
-    train_lang1 = "train/split_train.lang1"
-    train_lang2 = "train/split_train.lang2"
-    val_lang1 = "val/split_val.lang1"
-    val_lang2 = "val/split_val.lang2"
+    train_lang1 = args.train_lang1
+    train_lang2 = args.train_lang2
+    val_lang1 = args.val_lang1
+    val_lang2 = args.val_lang2
 
     # load data and create vocab
     english, english_vocab, english_word2id, english_id2word = read_file_and_process(data_path, train_lang1, limit_vocab=9000)
