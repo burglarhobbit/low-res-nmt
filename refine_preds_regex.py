@@ -3,13 +3,23 @@ import os, re
 from tqdm import tqdm
 
 def main(args):
+    """
+    Main function to refine predictions by removing repeated n-gram tokens
+    and saving it in a file.
+
+    Args:
+        args: An argpase object that contains processed arguments
+    Returns:
+        None
+    """
     path = args.file
     file_path_suffix, ext = os.path.splitext(path)
     out_path = file_path_suffix + "_regex" + ext
 
     print("Processing input file:",path)
     lines = [i.strip() for i in open(path,'r').readlines()]
-    # reuse the variable pattern
+    
+    # reuse the variable $pattern
     pattern = re.compile(r'(\b.+\b)\1\b') # bigram
 
     out = []
@@ -17,7 +27,8 @@ def main(args):
         while pattern.search(line):
             line = pattern.sub(r'\1', line)
         out.append(line)
-    print("Saving to:",out_path,"...")
+
+    print("Saving to:", out_path, "...")
     with open(out_path,'w') as f:
         for line in tqdm(out):
             print(line,file=f)
