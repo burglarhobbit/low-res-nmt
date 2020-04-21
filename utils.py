@@ -134,9 +134,21 @@ def transform_data(lang, word2id, amount_data_start=None,amount_data_end=None):
 
 class DatasetGenerator(tf.data.Dataset):
   """
-  ! Raghav
+  Create a tf.data.Dataset with data augmentation: noise in input sequences
   """
   def _generator(data_1,data_2,p_wd):
+    """
+    Generator with noising in inputs 
+
+    Args:
+      data_1 (list): list of lists of source language sequences 
+      data_2 (list): list of lists of target language sequences
+      p_wd (float): probability of word drop 
+
+    Returns:
+      aug (tf.Tensor): input for transformer
+      tar (tf.Tensor): real target for transformer
+    """
     inp_pad = tf.keras.preprocessing.sequence.pad_sequences(data_1, padding='post').shape[1]
     tar_pad = tf.keras.preprocessing.sequence.pad_sequences(data_2, padding='post').shape[1]
     indexes = np.arange(len(data_2))
