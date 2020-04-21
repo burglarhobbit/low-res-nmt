@@ -385,7 +385,7 @@ def main(args):
             print("training Parallel data")
 
             for (batch, (inp, tar)) in tqdm(enumerate(tensor_train)):
-                train_step(inp, tar)
+                train_manager.train_step(inp, tar)
                 if batch % 50 == 0:
                     print('Epoch {} iteration_i {} Batch {} Training Loss {:.4f} Accuracy {:.4f}'.format(
                         epoch + 1, iteration_i, batch, train_manager.train_loss.result(), train_manager.train_accuracy.result()))
