@@ -26,8 +26,7 @@ $DATA_PATH=/path/to/data
 	--p_wd_st 0.3 --p_wd_bt 0.1 --dropout_rate 0.4 --start 200000 \
 	--st --bt
 
-### Reconstructing our pipeline (from scratch)
-
+### Reconstructing our pipeline (from scratch):
 
 #### Split Data
 
@@ -37,9 +36,9 @@ $DATA_PATH=/path/to/data
 
 - `python split_data.py --data_path $DATA_PATH`
 
-#### Train Self-Training and Back-Translation models on parallel-data
+### Train Self-Training and Back-Translation models on parallel-data
 
-##### Self-Training:
+#### Self-Training:
 
 CUDA_VISIBLE_DEVICES="0" python train.py --data_path $DATA_PATH --experiment 1_st --batch_size 64 \
 	--num_layer 1 --d_model 1024 --dff 1024 --epochs 50 \
@@ -49,7 +48,7 @@ CUDA_VISIBLE_DEVICES="0" python train.py --data_path $DATA_PATH --experiment 1_s
 	--val_lang1 train/split_train.lang1 \
 	--val_lang2 train/split_train.lang2 \
 
-##### Back-Translation:
+#### Back-Translation:
 switch the languages
 
 CUDA_VISIBLE_DEVICES="0" python train.py --data_path $DATA_PATH --experiment 1_bt --batch_size 64 \
@@ -60,7 +59,7 @@ CUDA_VISIBLE_DEVICES="0" python train.py --data_path $DATA_PATH --experiment 1_b
 	--val_lang1 train/split_train.lang2 \
 	--val_lang2 train/split_train.lang1 \
 
-## Forward Generation on Monolingual Data
+### Forward Generation on Monolingual Data
 
 - `CUDA_VISIBLE_DEVICES="0" python generation.py --checkpoint_path $/path/to/st/model \
  --npz_path ../model/data_and_vocab_bt_st_upsample_best.npz \
@@ -68,7 +67,7 @@ CUDA_VISIBLE_DEVICES="0" python train.py --data_path $DATA_PATH --experiment 1_b
 
 Predictions generated will be saved in an outfile: `predictions_english_monolingual_$(START)_$(END).txt`
 
-## Backward Generation on Monolingual Data
+### Backward Generation on Monolingual Data
 
 - `CUDA_VISIBLE_DEVICES="0" python generation.py --checkpoint_path $/path/to/bt/model \
  --npz_path ../model/data_and_vocab_bt_st_upsample_best.npz \
@@ -81,4 +80,4 @@ Predictions generated will be saved in an outfile: `predictions_english_monoling
 - `python refine_preds_regex.py --file predictions/forward/txt
 - `python refine_preds_regex.py --file predictions/backward/txt
 
-### Train the best model as described afte evaluation section and repeat for n-iterations
+### Train the best model as described after evaluation section, and repeat for n-iterations!
